@@ -106,6 +106,3 @@ if __name__ == "__main__":
         
 
 
-    wpc = word_people_count()
-    
-
