@@ -107,9 +107,6 @@ if __name__ == "__main__":
 
 
     wpc = word_people_count()
-    print_td_score('Arvid Larsson')
-    print(" ")
-    print_td_score('Eric Bergvall')
-    a = pwc[me].keys()
+
     
 
