@@ -97,19 +97,15 @@ if __name__ == "__main__":
         f = open(filename, 'rb')
         pwc = pickle.load(f)
         f.close()
-        print("Index loaded!")
     except:
-        print("Index file not found. Indexing")
-
+        print("Index file not found. Indexing, may take a while..", end = '')
         pwc = people_word_count()
         with open(filename, 'wb') as f:
             pickle.dump(pwc, f)
+        print("Done!")
+        
 
 
     wpc = word_people_count()
-    print_td_score('Arvid Larsson')
-    print(" ")
-    print_td_score('Eric Bergvall')
-    a = pwc[me].keys()
     
 
