@@ -18,6 +18,19 @@ def tf_idt(word, name):
     word_name_count = pwc[name][word]
     return name_word_count/n_words_person * math.log(n_names/n_person_word, 10)
 
+def tf_idt_words(name) -> np.array:
+    n_words = len(wpc)
+    tf_idts = np.zeros(n_words)
+    for word, i in zip(wpc.keys(), range(n_words)):
+        if not word in pwc[name]: continue
+        tf_idts[i] = tf_idt(word, name)
+    return tf_idts
+
+def person_tf_idt() -> dict:
+    pti = dict()
+    for name in pwc.keys():
+        pti[name] = tf_idt_words(name)
+
 def sparse_cossine(v1, v2) -> float:
     """ Returns cosine for a pair of sparse vectors """
     abs_v1 = np.sqrt(sum(map(lambda x: x*x, v1)))
@@ -53,7 +66,8 @@ if __name__ == "__main__":
             pickle.dump(pwc, f)
         print("Done!")
     wpc = indexing.word_people_count(pwc)
-    #print_tf_score('Arvid Larsson')
+    pti = person_tf_idt()
+    print(tf_idt_words('Arvid Larsson'))
         
 
 
