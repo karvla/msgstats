@@ -1,6 +1,7 @@
 import os
 import json
 from stop_words import get_stop_words
+import regex as re
 
 inbox_path = 'messages/inbox/'
 stopwords = set((get_stop_words('en'))).union(set(get_stop_words('sv'))) # TODO: Make not hardcoded
