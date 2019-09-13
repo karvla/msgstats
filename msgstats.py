@@ -7,10 +7,8 @@ import indexing
 import numpy as np
 import matplotlib.pyplot as plt
 
-me = 'Arvid Larsson'
-
-
 def tf_idt(word, name):
+    """ Returns the tf-idt for a given word and a name"""
     if not name in wpc[word]: return 0.0
     n_names = len(pwc)
     n_words_person = len(pwc[name])
@@ -20,6 +18,7 @@ def tf_idt(word, name):
     return name_word_count/n_words_person * math.log(n_names/n_person_word, 10)
 
 def tf_idt_words(name) -> np.array:
+    """ Returns an array with tf_idt for every word for given name"""
     n_words = len(wpc)
     tf_idts = np.zeros(n_words)
     for word, i in zip(wpc.keys(), range(n_words)):
@@ -28,6 +27,7 @@ def tf_idt_words(name) -> np.array:
     return tf_idts
 
 def person_tf_idt() -> dict:
+    """ Returns a dict with a tf_idt-array for every person"""
     pti = dict()
     for name in pwc.keys():
         pti[name] = tf_idt_words(name)
@@ -44,18 +44,21 @@ def sparse_cossine(v1, v2) -> float:
     return float(dot_prod/(abs_v1*abs_v2))
 
 def print_tf_score(name, N=20):
+    """ Prints the words with the highest tf-idt for a given name """
     words = pwc[name].keys()
     tf = list(map(lambda w: tf_idt(w, name), words))
     for i in sorted(zip(words, tf), key=lambda x: x[1], reverse=True)[:N]:
         print(i)
 
-def most_words_written(N=20):
+def print_names_with_most_words_written(N=20):
     name_word_sum = [(name, sum(pwc[name].values())) for name in pwc.keys()]
     print("Most words written:")
     for i in sorted(name_word_sum, key=lambda x : x[1], reverse=True)[:N]:
         print(i)
 
 def plot_cosim_vs_words(self_name):
+    """ Plots the number of written words vs. the 
+        cosinus similarity between all names and self_name """
     fig, ax = plt.subplots()
     ax = fig.add_subplot(111)
     for name in pwc.keys():
@@ -85,7 +88,7 @@ if __name__ == "__main__":
         with open(filename, 'wb') as f:
             pickle.dump(index, f)
         print("Done!")
-    spacer = "{0:<10} {1:<10}"
+
 
 
 
