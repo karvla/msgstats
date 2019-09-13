@@ -5,6 +5,7 @@ from itertools import combinations
 from functools import reduce
 import indexing
 import numpy as np
+import matplotlib.pyplot as plt
 
 me = 'Arvid Larsson'
 
@@ -30,6 +31,7 @@ def person_tf_idt() -> dict:
     pti = dict()
     for name in pwc.keys():
         pti[name] = tf_idt_words(name)
+    return pti
 
 def sparse_cossine(v1, v2) -> float:
     """ Returns cosine for a pair of sparse vectors """
@@ -53,21 +55,42 @@ def most_words_written(N=20):
     for i in sorted(name_word_sum, key=lambda x : x[1], reverse=True)[:N]:
         print(i)
 
+def plot_cosim_vs_words(self_name):
+    fig, ax = plt.subplots()
+    ax = fig.add_subplot(111)
+    for name in pwc.keys():
+        if name == self_name: continue
+        x = sparse_cossine(pti[self_name], pti[name])
+        y = sum(pwc[name].values())
+        label = ax.annotate(name, xy=(x, y), fontsize=12, ha="center")
+        plt.scatter(x, y)
+    plt.xlabel("tf-idf cossine similarity against " + self_name)
+    plt.ylabel("#words written")
+    plt.yscale("log")
+    plt.show()
+
 if __name__ == "__main__":
     filename = 'index_file'
 
     try:
         f = open(filename, 'rb')
-        pwc = pickle.load(f)
+        pwc, wpc, pti = pickle.load(f)
         f.close()
     except:
         print("Index file not found. Indexing, may take a while..", end = '')
+        pwc = indexing.people_word_count()
+        wpc = indexing.word_people_count(pwc)
+        pti = person_tf_idt()
+        index = (pwc, wpc, pti)
         with open(filename, 'wb') as f:
-            pickle.dump(pwc, f)
+            pickle.dump(index, f)
         print("Done!")
-    wpc = indexing.word_people_count(pwc)
-    pti = person_tf_idt()
-    print(tf_idt_words('Arvid Larsson'))
+    spacer = "{0:<10} {1:<10}"
+
+
+
+    
+
         
 
 
