@@ -80,7 +80,7 @@ if __name__ == "__main__":
         pwc, wpc, pti = pickle.load(f)
         f.close()
     except:
-        print("Index file not found. Indexing, may take a while..", end = '')
+        print("Index file not found. Indexing, may take a while..")
         pwc = indexing.people_word_count()
         wpc = indexing.word_people_count(pwc)
         pti = person_tf_idt()
