@@ -6,6 +6,7 @@ from functools import reduce
 import indexing
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
 
 def tf_idt(word, name):
     """ Returns the tf-idt for a given word and a name"""
@@ -73,21 +74,37 @@ def plot_cosim_vs_words(self_name):
     plt.show()
 
 if __name__ == "__main__":
+    from sklearn.decomposition import TruncatedSVD
     filename = 'index_file'
 
     try:
         f = open(filename, 'rb')
-        pwc, wpc, pti = pickle.load(f)
+        pwc, wpc, pti, xt, svd = pickle.load(f)
         f.close()
     except:
         print("Index file not found. Indexing, may take a while..")
         pwc = indexing.people_word_count()
         wpc = indexing.word_people_count(pwc)
         pti = person_tf_idt()
-        index = (pwc, wpc, pti)
+        X = np.zeros((len(pwc), len(wpc)))
+        xt = TSNE(n_components=2).fit_transform(X)
+        svd = TruncatedSVD(n_components=5, n_iter=7, random_state=42)
+        svd.fit(X)
+        index = (pwc, wpc, pti, xt, svd)
         with open(filename, 'wb') as f:
             pickle.dump(index, f)
         print("Done!")
+
+
+
+    X = np.zeros((len(pwc), len(wpc)))
+    xt = svd.singular_values_
+    print(xt)
+    plt.scatter(x,y)
+    for i, name in zip(range(len(pti)), pti.keys()):
+        plt.annotate(name, (x[i], y[i]))
+    plt.show()
+
 
 
 
