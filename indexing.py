@@ -2,6 +2,8 @@ import os
 import json
 from stop_words import get_stop_words
 import regex as re
+from datetime import date
+import numpy as np
 
 inbox_path = "messages/inbox/"
 stopwords = set((get_stop_words("en"))).union(
@@ -21,16 +23,21 @@ def _add_word_count(index, word):
     "Adds 1 to count and returns the index"
     if word in stopwords:
         return index
-    if word in index:
-        index[word] += 1
     else:
-        index[word] = 1
+        return count(index, word)
+
+
+def count(index, obj):
+    if obj in index:
+        index[obj] += 1
+    else:
+        index[obj] = 1
     return index
 
 
 def people_word_count():
     """ person -->  word --> nr"""
-    index = dict()
+    index = {}
     for dir_name, subdirs, thread in os.walk(inbox_path):
         for fname in thread:
             path = "/".join([dir_name, fname])
@@ -63,3 +70,47 @@ def word_people_count(pwc):
             else:
                 wpc[word] = dict([(name, pwc[name][word])])
     return wpc
+
+
+def people_timestamp(self_name):
+    """ Returns a dict with names as keys
+        and a list of timestamps as values
+        on the format [[recived_timestamp], [sent_timestamp]]. """
+    index = {}
+    for dir_name, subdirs, thread in os.walk(inbox_path):
+        for fname in thread:
+            path = "/".join([dir_name, fname])
+            if not re.findall(".json", path):
+                continue
+            with open(path, encoding="utf-8") as f:
+                thread = json.load(f)
+                if "messages" not in thread or len(thread["participants"]) != 2:
+                    continue
+                participant1 = _decode(thread["participants"][0]["name"])
+                participant2 = _decode(thread["participants"][1]["name"])
+                if participant1 == self_name:
+                    friend_name = participant2
+                else:
+                    friend_name = participant1
+                if friend_name not in index:
+                    index[friend_name] = [[], []]
+                for msg in thread["messages"]:
+                    if not "content" in msg:
+                        continue
+                    time = msg["timestamp_ms"]/1000
+                    if msg["sender_name"] == friend_name:
+                        index[friend_name][0].append(time)
+                    else:
+                        index[friend_name][1].append(time)
+    return index
+
+
+def msgs_per_day(people_timestamp_dict):
+    ptd = people_timestamp_dict
+    index = {}
+    for name in ptd.keys():
+        date_dict = {}
+        [count(date_dict, date.fromtimestamp(ts)) for ts in ptd[name][0]]
+        [count(date_dict, date.fromtimestamp(ts)) for ts in ptd[name][1]]
+        index[name] = date_dict
+    return index
