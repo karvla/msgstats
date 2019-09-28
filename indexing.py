@@ -93,38 +93,44 @@ def people_timestamp(self_name):
                 else:
                     friend_name = participant1
                 if friend_name not in index:
-                    index[friend_name] = [[], []]
+                    index[friend_name] = {"from" : [], "to": []}
                 for msg in thread["messages"]:
                     if not "content" in msg:
                         continue
-                    n_words = len(_words(msg["content"]))
+                    content = _decode(msg["content"])
+                    n_words = len(_words(content))
                     time = msg["timestamp_ms"]/1000
+                    msg_dict = {"content": content, "n_words": n_words, "timestamp": time}
                     if _decode(msg["sender_name"]) == friend_name:
-                        index[friend_name][0].append((time, n_words))
+                        msg_dict["name"] = friend_name
+                        index[friend_name]["from"].append(msg_dict)
                     else:
-                        index[friend_name][1].append((time, n_words))
+                        msg_dict["name"] = self_name
+                        index[friend_name]["to"].append((msg_dict))
     return index
 
 
 def msgs_per_day(people_timestamp_dict):
     ptd = people_timestamp_dict
     index = {}
+    d = date.fromtimestamp
     for name in ptd.keys():
         date_recieved = {}
         date_sent = {}
-        [count(date_recieved, date.fromtimestamp(ts)) for ts, _ in ptd[name][0]]
-        [count(date_sent, date.fromtimestamp(ts)) for ts, _ in ptd[name][1]]
+        [count(date_recieved, d(msg["timestamp"])) for msg in ptd[name]["from"]]
+        [count(date_sent, d(msg["timestamp"])) for msg in ptd[name]["to"]]
         index[name] = {"to": date_sent, "from": date_recieved}
     return index
 
 def words_per_day(people_timestamp_dict):
     ptd = people_timestamp_dict
     index = {}
+    d = date.fromtimestamp
     for name in ptd.keys():
         date_recieved = {}
         date_sent = {}
-        [count(date_recieved, date.fromtimestamp(ts), N) for ts, N in ptd[name][0]]
-        [count(date_sent, date.fromtimestamp(ts), N) for ts, N in ptd[name][1]]
+        [count(date_recieved, d(msg["timestamp"]), msg["n_words"]) for msg in ptd[name]["from"]]
+        [count(date_sent, d(msg["timestamp"]), msg["n_words"]) for msg in ptd[name]["to"]]
         index[name] = {"to": date_sent, "from": date_recieved}
     return index
 

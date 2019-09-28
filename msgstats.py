@@ -3,7 +3,7 @@ import pickle
 import math
 from itertools import combinations
 from functools import reduce
-from datetime import timedelta
+from datetime import timedelta, datetime, date
 import indexing
 import numpy as np
 import matplotlib.pyplot as plt
@@ -83,7 +83,7 @@ def plot_cosim_vs_words(self_name):
     plt.xlabel("tf-idf cossine similarity against " + self_name)
     plt.ylabel("#words written")
     plt.yscale("log")
-    plt.show()
+    plt.draw()
 
 
 def plot_freq(names, date_dict, ylabel="", yscale="linear"):
@@ -98,7 +98,7 @@ def plot_freq(names, date_dict, ylabel="", yscale="linear"):
     plt.ylabel(ylabel)
     plt.yscale(yscale)
     plt.legend()
-    plt.show()
+    plt.draw()
 
 
 def moving_avg(date_dict, N=30):
@@ -113,6 +113,24 @@ def moving_avg(date_dict, N=30):
     d_avg = dates_full[w:-w]
     return d_avg, y_avg
 
+def print_conv(name, start_date=None, end_date=None, filter_len=0):
+    start = datetime.strptime(start_date, '%Y-%m-%d')
+    end = datetime.strptime(end_date, '%Y-%m-%d')
+    msg_tot =  pts[name]["to"] + pts[name]["from"]
+    msg_sorted = sorted(msg_tot, key=lambda x: x["timestamp"])
+
+    for msg in msg_sorted:
+        msg_date = datetime.fromtimestamp(msg["timestamp"])
+        name = msg["name"]
+        content = msg["content"]
+        n_words = msg["n_words"]
+        if start < msg_date and msg_date < end and n_words > filter_len:
+            print(name + " " + msg_date.strftime('%Y-%m-%d, %H:%M:%S') + ":")
+            print(content)
+            print()
+
+
+        
 
 if __name__ == "__main__":
     from sklearn.decomposition import TruncatedSVD
@@ -134,9 +152,8 @@ if __name__ == "__main__":
             pickle.dump(index, f)
         print("Done!")
 
-    names = []
     mpd = indexing.msgs_per_day(pts)
     wpd = indexing.words_per_day(pts)
     plot_freq(names, wpd, "words per month")
-    plot_freq(names, mpd, "messages per month")
-    plt.show()
+    #plot_freq(names, mpd, "messages per month")
+    #plt.show()
