@@ -99,7 +99,7 @@ def people_timestamp(self_name):
                         continue
                     n_words = len(_words(msg["content"]))
                     time = msg["timestamp_ms"]/1000
-                    if msg["sender_name"] == friend_name:
+                    if _decode(msg["sender_name"]) == friend_name:
                         index[friend_name][0].append((time, n_words))
                     else:
                         index[friend_name][1].append((time, n_words))
@@ -110,19 +110,22 @@ def msgs_per_day(people_timestamp_dict):
     ptd = people_timestamp_dict
     index = {}
     for name in ptd.keys():
-        date_dict = {}
-        [count(date_dict, date.fromtimestamp(ts)) for ts, _ in ptd[name][0]]
-        [count(date_dict, date.fromtimestamp(ts)) for ts, _ in ptd[name][1]]
-        index[name] = date_dict
+        date_recieved = {}
+        date_sent = {}
+        [count(date_recieved, date.fromtimestamp(ts)) for ts, _ in ptd[name][0]]
+        [count(date_sent, date.fromtimestamp(ts)) for ts, _ in ptd[name][1]]
+        index[name] = {"to": date_sent, "from": date_recieved}
     return index
 
 def words_per_day(people_timestamp_dict):
     ptd = people_timestamp_dict
     index = {}
     for name in ptd.keys():
-        date_dict = {}
-        [count(date_dict, date.fromtimestamp(ts), N) for ts, N in ptd[name][0]]
-        [count(date_dict, date.fromtimestamp(ts), N) for ts, N in ptd[name][1]]
-        index[name] = date_dict
+        date_recieved = {}
+        date_sent = {}
+        [count(date_recieved, date.fromtimestamp(ts), N) for ts, N in ptd[name][0]]
+        [count(date_sent, date.fromtimestamp(ts), N) for ts, N in ptd[name][1]]
+        index[name] = {"to": date_sent, "from": date_recieved}
     return index
+
 
