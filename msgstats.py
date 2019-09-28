@@ -86,18 +86,22 @@ def plot_cosim_vs_words(self_name):
     plt.show()
 
 
-def plot_msg_per_day(names):
-    fig, ax = plt.subplots()
-    ax = fig.add_subplot()
+def plot_freq(names, date_dict, ylabel="", yscale="linear"):
     for name in names:
-        x, y = moving_avg(mpd[name])
-        plt.plot(x, y, label=name)
-    plt.ylabel("#messeges sent and received")
+        x, y = moving_avg(date_dict[name]["to"])
+        p = plt.plot(x, y, label=("to " + name))
+        p[-1].get_color()
+
+        x, y = moving_avg(date_dict[name]["from"])
+        plt.plot(x, y, label="from " + name)
+
+    plt.ylabel(ylabel)
+    plt.yscale(yscale)
     plt.legend()
     plt.show()
 
 
-def moving_avg(date_dict, N=100):
+def moving_avg(date_dict, N=30):
     w = N // 2 - 1
     start_date = min(date_dict.keys())
     end_date = max(date_dict.keys())
@@ -130,4 +134,9 @@ if __name__ == "__main__":
             pickle.dump(index, f)
         print("Done!")
 
+    names = []
     mpd = indexing.msgs_per_day(pts)
+    wpd = indexing.words_per_day(pts)
+    plot_freq(names, wpd, "words per month")
+    plot_freq(names, mpd, "messages per month")
+    plt.show()
