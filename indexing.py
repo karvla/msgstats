@@ -27,11 +27,11 @@ def _add_word_count(index, word):
         return count(index, word)
 
 
-def count(index, obj):
+def count(index, obj, N=1):
     if obj in index:
-        index[obj] += 1
+        index[obj] += N
     else:
-        index[obj] = 1
+        index[obj] = N
     return index
 
 
@@ -74,8 +74,8 @@ def word_people_count(pwc):
 
 def people_timestamp(self_name):
     """ Returns a dict with names as keys
-        and a list of timestamps as values
-        on the format [[recived_timestamp], [sent_timestamp]]. """
+        and a list of timestamps as values on the format
+        [[(recived_timestamp, n_words)], [(sent_timestamp, n_words)]]. """
     index = {}
     for dir_name, subdirs, thread in os.walk(inbox_path):
         for fname in thread:
@@ -97,11 +97,12 @@ def people_timestamp(self_name):
                 for msg in thread["messages"]:
                     if not "content" in msg:
                         continue
+                    n_words = len(_words(msg["content"]))
                     time = msg["timestamp_ms"]/1000
                     if msg["sender_name"] == friend_name:
-                        index[friend_name][0].append(time)
+                        index[friend_name][0].append((time, n_words))
                     else:
-                        index[friend_name][1].append(time)
+                        index[friend_name][1].append((time, n_words))
     return index
 
 
@@ -110,7 +111,18 @@ def msgs_per_day(people_timestamp_dict):
     index = {}
     for name in ptd.keys():
         date_dict = {}
-        [count(date_dict, date.fromtimestamp(ts)) for ts in ptd[name][0]]
-        [count(date_dict, date.fromtimestamp(ts)) for ts in ptd[name][1]]
+        [count(date_dict, date.fromtimestamp(ts)) for ts, _ in ptd[name][0]]
+        [count(date_dict, date.fromtimestamp(ts)) for ts, _ in ptd[name][1]]
         index[name] = date_dict
     return index
+
+def words_per_day(people_timestamp_dict):
+    ptd = people_timestamp_dict
+    index = {}
+    for name in ptd.keys():
+        date_dict = {}
+        [count(date_dict, date.fromtimestamp(ts), N) for ts, N in ptd[name][0]]
+        [count(date_dict, date.fromtimestamp(ts), N) for ts, N in ptd[name][1]]
+        index[name] = date_dict
+    return index
+
