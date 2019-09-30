@@ -8,6 +8,8 @@ import indexing
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
+from setup import path_cache, path_home
+import os
 
 
 def tf_idt(word, name):
@@ -142,22 +144,6 @@ def print_conv(
 
 
 if __name__ == "__main__":
-    filename = "index_file"
-
-    try:
-        f = open(filename, "rb")
-        pwc, wpc, pti, pts = pickle.load(f)
-        f.close()
-    except:
-        print("Index file not found. Indexing, may take a while..")
-        pwc = indexing.people_word_count()
-        wpc = indexing.word_people_count(pwc)
-        pti = person_tf_idt()
-        pts = indexing.people_timestamp("Arvid Larsson")
-        index = (pwc, wpc, pti, pts)
-        with open(filename, "wb") as f:
-            pickle.dump(index, f)
-        print("Done!")
-
-    mpd = indexing.msgs_per_day(pts)
-    wpd = indexing.words_per_day(pts)
+    os.chdir("/")
+    with open(path_cache, 'rb') as f:
+        pwc, wpc, pti, pts, mpd, wpd = pickle.load(f)

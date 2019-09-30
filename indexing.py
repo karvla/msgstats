@@ -3,12 +3,7 @@ import json
 from stop_words import get_stop_words
 import regex as re
 from datetime import date
-import numpy as np
-
-inbox_path = "messages/inbox/"
-stopwords = set((get_stop_words("en"))).union(
-    set(get_stop_words("sv"))
-)  # TODO: Make not hardcoded
+import tf_idt
 
 
 def _words(text):
@@ -21,6 +16,9 @@ def _decode(string):
 
 def _add_word_count(index, word):
     "Adds 1 to count and returns the index"
+    stopwords = set((get_stop_words("en"))).union(
+        set(get_stop_words("sv"))
+    )  # TODO: Make not hardcoded
     if word in stopwords:
         return index
     else:
@@ -35,7 +33,7 @@ def count(index, obj, N=1):
     return index
 
 
-def people_word_count():
+def people_word_count(inbox_path):
     """ person -->  word --> nr"""
     index = {}
     for dir_name, subdirs, thread in os.walk(inbox_path):
@@ -72,7 +70,7 @@ def word_people_count(pwc):
     return wpc
 
 
-def people_timestamp(self_name):
+def people_timestamp(self_name, inbox_path):
     """ Returns a dict with names as keys
         and a list of timestamps as values on the format
         [[(recived_timestamp, n_words)], [(sent_timestamp, n_words)]]. """
@@ -133,5 +131,16 @@ def words_per_day(people_timestamp_dict):
         [count(date_sent, d(msg["timestamp"]), msg["n_words"]) for msg in ptd[name]["to"]]
         index[name] = {"to": date_sent, "from": date_recieved}
     return index
+
+def person_tf_idt(person_word_count, word_person_count) -> dict:
+    """ Returns a dict with a tf_idt-array for every person"""
+    pwc = person_word_count
+    wpc = word_person_count
+    pti = dict()
+    for name in pwc.keys():
+        pti[name] = tf_idt.tf_idt_words(name, wpc, pwc)
+    return pti
+
+
 
 
