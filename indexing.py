@@ -3,7 +3,7 @@ import json
 from stop_words import get_stop_words
 import regex as re
 from datetime import date
-import tf_idt
+#import tf_idt
 
 
 def _words(text):
@@ -23,6 +23,10 @@ def _add_word_count(index, word):
         return index
     else:
         return count(index, word)
+
+def _is_messages(content):
+    return not (re.findall('^\p{L}+ missed your (call|video chat).$', content) or
+                re.findall('^You missed a (call|video chat) (from|with) \p{L}+.$', content))
 
 
 def count(index, obj, N=1):
@@ -73,7 +77,7 @@ def word_people_count(pwc):
 def people_timestamp(self_name, inbox_path):
     """ Returns a dict with names as keys
         and a list of timestamps as values on the format
-        [[(recived_timestamp, n_words)], [(sent_timestamp, n_words)]]. """
+        index[name][to/from][content/n_words/timestamp]. """
     index = {}
     for dir_name, subdirs, thread in os.walk(inbox_path):
         for fname in thread:
