@@ -3,7 +3,7 @@ import json
 from stop_words import get_stop_words
 import regex as re
 from datetime import date
-#import tf_idt
+import tf_idf_tools as tf_idf
 
 
 def _words(text):
@@ -50,7 +50,7 @@ def people_word_count(inbox_path):
                 if "messages" not in data:
                     continue
                 for msg in data["messages"]:
-                    if not "content" in msg:
+                    if not "content" in msg or not _is_messages(msg["content"]):
                         continue
                     content = _decode(msg["content"])
                     name = _decode(msg["sender_name"])
@@ -97,7 +97,7 @@ def people_timestamp(self_name, inbox_path):
                 if friend_name not in index:
                     index[friend_name] = {"from" : [], "to": []}
                 for msg in thread["messages"]:
-                    if not "content" in msg:
+                    if not "content" in msg or not _is_messages(msg["content"]):
                         continue
                     content = _decode(msg["content"])
                     n_words = len(_words(content))
@@ -136,14 +136,14 @@ def words_per_day(people_timestamp_dict):
         index[name] = {"to": date_sent, "from": date_recieved}
     return index
 
-def person_tf_idt(person_word_count, word_person_count) -> dict:
-    """ Returns a dict with a tf_idt-array for every person"""
-    pwc = person_word_count
-    wpc = word_person_count
-    pti = dict()
-    for name in pwc.keys():
-        pti[name] = tf_idt.tf_idt_words(name, wpc, pwc)
-    return pti
+#def person_tf_idf(person_word_count, word_person_count) -> dict:
+#    """ Returns a dict with a tf_idf-array for every person"""
+#    pwc = person_word_count
+#    wpc = word_person_count
+#    pti = dict()
+#    for name in pwc.keys():
+#        pti[name] = tf_idf.tf_idf_words(name)
+#    return pti
 
 
 

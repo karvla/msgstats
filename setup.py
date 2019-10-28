@@ -2,6 +2,7 @@ import os
 import sys
 import indexing
 import pickle
+import tf_idf_tools as tf_idf
 
 path_home = os.path.expanduser('~')
 path_config = path_home + '/.config'
@@ -52,7 +53,7 @@ if __name__ == "__main__":
     sys.stdout.write(b)
     sys.stdout.flush()
 
-    pti = indexing.person_tf_idt(pwc, wpc)
+    pti = tf_idf.person_tf_idf(pwc, wpc)
     sys.stdout.write(b)
     sys.stdout.flush()
 

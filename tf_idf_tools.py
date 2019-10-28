@@ -6,12 +6,6 @@ import os
 import pickle
 import matplotlib.pyplot as plt
 
-"""
-Imports person_word_count, word_person_count, and person_tf_idt
-"""
-with open(path_cache, "rb") as f:
-    pwc, wpc, pti, _, _, _ = pickle.load(f)
-
 
 def tf_idf(word, name):
     """ Returns the tf-idf for a given word and a name"""
@@ -36,8 +30,12 @@ def tf_idf_words(name) -> np.array:
     return tf_idfs
 
 
-def person_tf_idf() -> dict:
+def person_tf_idf(person_word_count, word_person_count) -> dict:
     """ Returns a dict with a tf_idf-array for every person"""
+    global wpc
+    global pwc
+    wpc = word_person_count
+    pwc = person_word_count
     pti = dict()
     for name in pwc.keys():
         pti[name] = tf_idf_words(name)
@@ -83,6 +81,8 @@ def plot_cosim_vs_words(self_name):
 
 
 if __name__ == "__main__":
+    with open(path_cache, "rb") as f:
+        pwc, wpc, pti, _, _, _ = pickle.load(f)
 
     parser = argparse.ArgumentParser(
         description="Uses tf-idf on the chat history, where every person is a document."
