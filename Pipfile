@@ -11,6 +11,7 @@ numpy = "*"
 stop-words = "*"
 sklearn = "*"
 matplotlib = "*"
+spotipy = "*"
 
 [requires]
 python_version = "3.6"
