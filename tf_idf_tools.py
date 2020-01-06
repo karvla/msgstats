@@ -1,4 +1,3 @@
-from setup import path_cache, path_home
 import math
 import numpy as np
 import argparse
@@ -6,6 +5,8 @@ import os
 import pickle
 import matplotlib.pyplot as plt
 
+path_home = os.path.expanduser('~')
+path_cache = path_home + '/.config/msgstats/cache'
 
 def tf_idf(word, name):
     """ Returns the tf-idf for a given word and a name"""
